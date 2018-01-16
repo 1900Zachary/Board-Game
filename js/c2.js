@@ -116,9 +116,9 @@ class Piece {
 
     //更改棋子属性
     newPos(newNum) {
-        g.block[this.num].color = -1;
-        this.num = newNum;
-        g.block[this.num].color = this.colorNum;
+        // g.block[this.num].color = -1;
+        // this.num = newNum;
+        // g.block[this.num].color = this.colorNum;
         this.position = this.TurnToPosition(newNum);
         this.radius = this.GD.gridPieceW * 0.45;
     }
@@ -149,7 +149,7 @@ var g = new Grid(sideLength);
 //movePiece
 function MovePiece(p1,tagetNum){ //传入p[num]棋子,移动的目标格，总时长
     let currentPosition = p1.TurnToPosition(p1.num);
-    console.log(currentPosition);
+    // console.log(currentPosition);
     let lastPosition = p1.TurnToPosition(tagetNum);
     let routePoint = g.BFS(p1.num,tagetNum);
     let routePosition = [];
@@ -256,7 +256,7 @@ function Eliminate(blockNum){
     Search(block[blockNum].position.x,block[blockNum].position.y,1,1,true,1);
     Search(block[blockNum].position.x,block[blockNum].position.y,1,0,true,1);
     Search(block[blockNum].position.x,block[blockNum].position.y,1,-1,true,1);
-    console.log(`last:${EliminateArray}`); 
+    // console.log(`last:${EliminateArray}`); 
 
     if (EliminateArray.length >4){
         for (let i=0;i<EliminateArray.length;i++){
@@ -313,7 +313,7 @@ function AddEventListeners() {
     function resizeListener() {
         window.removeEventListener("resize",resizeListener);
         setTimeout(() => {
-            updateAll();
+            resizeUpdateAll();
             window.addEventListener("resize",resizeListener);
         },500)
     }
@@ -334,9 +334,7 @@ function ClickEvent(e){
             g.DeletePiece(saveN);
         } else if (saveN != tempN) if(isSelected && g.Arrive(saveN,tempN)) { //当前位置没有棋子，且为选中态，上个棋盘格与当前棋盘格连通
             gridDisplay.clear();
-            //p[saveN].MovePiece(tempN);
             MovePiece(p[saveN],tempN);
-            //p[saveN].newPos(tempN);
             isSelected = false;
             p[tempN] = p[saveN];
             p[saveN]=0;
@@ -346,6 +344,18 @@ function ClickEvent(e){
     }
     
 }
+//resize重新绘图
+function resizeUpdateAll() {
+    if ((window.innerWidth / window.innerHeight) >= sideLength / 16) isKeepWidth = true
+    else isKeepWidth = false;
+    gridDisplay.update();
+    for (let i in p) {
+        if (p[i] != 0) {
+            p[i].newPos(i);
+            p[i].update();
+        }
+    }
+}
 //重新绘图
 function updateAll() {
     if ((window.innerWidth / window.innerHeight) >= sideLength / 16) isKeepWidth = true
@@ -353,7 +363,6 @@ function updateAll() {
     gridDisplay.update();
     for (let i in p) {
         if (p[i] != 0) {
-            //p[i].newPos(i);
             p[i].update();
         }
     }
