@@ -1,3 +1,4 @@
+/// <reference path="g.js"/>
 //定义游戏属性
 const pieceColor = ["#ff0000","#ff80c0","#8000ff","#80ffff","#ff8000","#80ff00","#0000ff"];
 const theme = {background: "#46A7AF",blockDark: "#317E8A",blockLight: "#46A7AF",gridBackground: "#3A909A",gridShadow: "#00000099"}
