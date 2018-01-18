@@ -11,6 +11,20 @@ let isSelected = false;
 var score=0;
 let saveN;
 var storeColor = [0,0,0];
+//分数区
+let scoreArea = document.getElementById("score_area");
+console.log(scoreArea);
+function updateScoreArea(SA){
+    let positionX;
+    if (isKeepWidth){
+        SA.style.width = `${window.innerHeight*9/16}px`;
+        SA.style.height = `${window.innerHeight*3.5/16}px`;
+        positionX = (window.innerWidth-window.innerHeight*9/16)/2;
+        console.log(positionX);
+    }
+    console.log(positionX);
+    SA.style.transform = "translateX("+positionX+"px)";
+}
 //棋盘层
 class GridDisplay {
     constructor(cParentNode) {
@@ -167,8 +181,6 @@ function MovePiece(p1,tagetNum){ //传入p[num]棋子,移动的目标格，总�
         bs = LocationFinder(routePosition[j],currentPosition,routePosition[j+1]);
         currentPosition[bs.derection]+=speed*bs.sign;
         ps = LocationFinder(routePosition[j],currentPosition,routePosition[j+1]);
-        // console.log(routePosition[j],currentPosition,routePosition[j+1]);
-        // console.log(bs);
         /*eslint-disable*/
         if (ps.isBetween==false){      
             if (typeof routePosition[j+2]!="object"){           
@@ -176,8 +188,6 @@ function MovePiece(p1,tagetNum){ //传入p[num]棋子,移动的目标格，总�
                 currentPosition.y=routePosition[j+1].y;
             }else{
                 ps = LocationFinder(routePosition[j+1],currentPosition,routePosition[j+2]);
-                // currentPosition.x = routePosition[j+1].x;
-                // currentPosition.y = routePosition[j+1].y;
                 currentPosition[ps.derection] = routePosition[j+1][ps.derection]+Math.abs(routePosition[j+1][bs.derection]-currentPosition[bs.derection])*ps.sign;
                 currentPosition[bs.derection] = routePosition[j+1][bs.derection];
                 j+=1;
@@ -257,15 +267,13 @@ function Eliminate(blockNum){
     Search(block[blockNum].position.x,block[blockNum].position.y,1,1,true,1);
     Search(block[blockNum].position.x,block[blockNum].position.y,1,0,true,1);
     Search(block[blockNum].position.x,block[blockNum].position.y,1,-1,true,1);
-    // console.log(`last:${EliminateArray}`); 
-
     if (EliminateArray.length >4){
         for (let i=0;i<EliminateArray.length;i++){
             p[EliminateArray[i]] = [];
             g.DeletePiece(EliminateArray[i]);
         }
         score+=10+(EliminateArray.length-5)*(EliminateArray.length-5)*2;
-        document.getElementById("score").innerHTML = score;
+        document.getElementById("score_area").innerHTML = score;
         return true;
     }else{
         return false;
@@ -361,6 +369,7 @@ function resizeUpdateAll() {
 function updateAll() {
     if ((window.innerWidth / window.innerHeight) >= sideLength / 16) isKeepWidth = true
     else isKeepWidth = false;
+    updateScoreArea(scoreArea);
     gridDisplay.update();
     for (let i in p) {
         if (p[i] != 0) {
