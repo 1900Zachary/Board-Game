@@ -23,7 +23,7 @@ function updateScoreArea(SA){
         console.log(positionX);
     }
     console.log(positionX);
-    SA.style.transform = "translateX("+positionX+"px)";
+    SA.style.transform = `translateX(${positionX}px)`;
 }
 //棋盘层
 class GridDisplay {
