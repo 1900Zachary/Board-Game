@@ -1,7 +1,7 @@
 /// <reference path="g.js"/>
 //定义游戏属性
 const pieceColor = ["#ff0000","#ff80c0","#8000ff","#80ffff","#ff8000","#80ff00","#0000ff"];
-const theme = {background: "#46A7AF",blockDark: "#317E8A",blockLight: "#46A7AF",gridBackground: "#3A909A",gridShadow: "#00000099"}
+const theme = {background: "#46A7AF",blockDark: "#317E8A",blockLight: "#46A7AF",gridBackground: "#3A909A",gridShadow: "#00000099"};
 const sideLength = 9;
 const speed = 18;
 //初始化基本参数
@@ -13,17 +13,29 @@ let saveN;
 var storeColor = [0,0,0];
 //分数区
 let scoreArea = document.getElementById("score_area");
-console.log(scoreArea);
-function updateScoreArea(SA){
+let scoreBlock = document.createElement("div");
+function updateScoreArea(){
     let positionX;
     if (isKeepWidth){
-        SA.style.width = `${window.innerHeight*9/16}px`;
-        SA.style.height = `${window.innerHeight*3.5/16}px`;
+        scoreArea.style.width = `${window.innerHeight*9/16}px`;
+        scoreArea.style.height = `${window.innerHeight*3.5/16}px`;
         positionX = (window.innerWidth-window.innerHeight*9/16)/2;
-        console.log(positionX);
+    }else{
+        scoreArea.style.width = `${window.innerWidth}px`;
+        scoreArea.style.height = `${(window.innerHeight-window.innerWidth)/2}px`;
+        positionX = 0;
     }
-    console.log(positionX);
-    SA.style.transform = `translateX(${positionX}px)`;
+    scoreArea.style.transform = `translateX(${positionX}px)`;
+    scoreArea.appendChild(scoreBlock);
+    scoreBlock.style.color = "white";
+    scoreBlock.style.position = "relative";
+    scoreBlock.style.fontSize = window.innerHeight*3.5/16*0.6;
+    scoreBlock.style.bottom = "-50%";
+    scoreBlock.style.transform = "translateY(-50%)";
+
+}
+function updateScore(){
+    scoreBlock.innerHTML = score;
 }
 //棋盘层
 class GridDisplay {
@@ -131,9 +143,6 @@ class Piece {
 
     //更改棋子属性
     newPos(newNum) {
-        // g.block[this.num].color = -1;
-        // this.num = newNum;
-        // g.block[this.num].color = this.colorNum;
         this.position = this.TurnToPosition(newNum);
         this.radius = this.GD.gridPieceW * 0.45;
     }
@@ -164,7 +173,6 @@ var g = new Grid(sideLength);
 //movePiece
 function MovePiece(p1,tagetNum){ //传入p[num]棋子,移动的目标格，总时长
     let currentPosition = p1.TurnToPosition(p1.num);
-    // console.log(currentPosition);
     let lastPosition = p1.TurnToPosition(tagetNum);
     let routePoint = g.BFS(p1.num,tagetNum);
     let routePosition = [];
@@ -273,7 +281,7 @@ function Eliminate(blockNum){
             g.DeletePiece(EliminateArray[i]);
         }
         score+=10+(EliminateArray.length-5)*(EliminateArray.length-5)*2;
-        document.getElementById("score_area").innerHTML = score;
+        updateScore();
         return true;
     }else{
         return false;
@@ -357,6 +365,8 @@ function ClickEvent(e){
 function resizeUpdateAll() {
     if ((window.innerWidth / window.innerHeight) >= sideLength / 16) isKeepWidth = true
     else isKeepWidth = false;
+    updateScoreArea();
+    updateScore();
     gridDisplay.update();
     for (let i in p) {
         if (p[i] != 0) {
@@ -369,7 +379,6 @@ function resizeUpdateAll() {
 function updateAll() {
     if ((window.innerWidth / window.innerHeight) >= sideLength / 16) isKeepWidth = true
     else isKeepWidth = false;
-    updateScoreArea(scoreArea);
     gridDisplay.update();
     for (let i in p) {
         if (p[i] != 0) {
@@ -383,6 +392,6 @@ function updateAll() {
     gridDisplay.start();
     RandomColor(5);
     RandomAddPiece(5);
-    updateAll();//先更新下画面
+    resizeUpdateAll();//先更新下画面
     AddEventListeners();//添加监听
 }());
