@@ -10,7 +10,14 @@ var p = [...Array(80).fill(0)];
 let isSelected = false;
 var score=0;
 let saveN;
-var storeColor = [0,0,0];
+var storeColor = [0,0,0];//
+//提示区
+//初始化
+function promptedAreaStart(){
+    var promptedAreaCanvas = document.createElement("canvas");
+    if (promptedAreaCanvas.getContext) var promptedAreaContext = promptedAreaCanvas.getContext("2d");
+    document.body.appendChild(promptedAreaCanvas);
+}
 //分数区
 let scoreArea = document.getElementById("score_area");
 let scoreBlock = document.createElement("div");
@@ -390,6 +397,7 @@ function updateAll() {
 (function () {
     g.Start();
     gridDisplay.start();
+    promptedAreaStart();
     RandomColor(5);
     RandomAddPiece(5);
     resizeUpdateAll();//先更新下画面
