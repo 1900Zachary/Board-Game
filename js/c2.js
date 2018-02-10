@@ -10,15 +10,34 @@ var p = [...Array(80).fill(0)];
 let isSelected = false;
 var score=0;
 let saveN;
-var storeColor = [0,0,0];//
-//提示区
+var storeColor = [0,0,0];//储存颜色
+var g = new Grid(sideLength);
+//*提示区
 //初始化
-function promptedAreaStart(){
+var promptedArea = {};
+var promptedAreaDiv = document.getElementById("prompted_area");
+promptedArea.Start = function(){
     var promptedAreaCanvas = document.createElement("canvas");
     if (promptedAreaCanvas.getContext) var promptedAreaContext = promptedAreaCanvas.getContext("2d");
-    document.body.appendChild(promptedAreaCanvas);
+    promptedAreaDiv.appendChild(promptedAreaCanvas);
+    promptedArea.update();
+};
+promptedArea.update = function(){
+    let positionX;
+    let positionY;
+    if (isKeepWidth){
+        promptedAreaDiv.style.width = `${window.innerHeight*9/16}px`;
+        promptedAreaDiv.style.height = `${window.innerHeightsdawsd/8}px`;
+        positionX = (window.innerWidth-window.innerHeight*9/16)/2;
+        positionY = window.innerHeight*25/32;
+    }else{
+        promptedAreaDiv.style.width = `${window.innerWidth}px`;
+        promptedAreaDiv.style.height = `${(window.innerHeight-window.innerWidth)*2/7}px`;
+        positionX = 0;
+        positionY = (window.innerHeight-window.innerWidth)*2/7
+    }
 }
-//分数区
+//*分数区
 let scoreArea = document.getElementById("score_area");
 let scoreBlock = document.createElement("div");
 function updateScoreArea(){
@@ -26,7 +45,7 @@ function updateScoreArea(){
     if (isKeepWidth){
         scoreArea.style.width = `${window.innerHeight*9/16}px`;
         scoreArea.style.height = `${window.innerHeight*3.5/16}px`;
-        positionX = (window.innerWidth-window.innerHeight*9/16)/2;
+        positionX = (window.innerWidth-window.innerHeight*25)/32;
     }else{
         scoreArea.style.width = `${window.innerWidth}px`;
         scoreArea.style.height = `${(window.innerHeight-window.innerWidth)/2}px`;
@@ -44,7 +63,7 @@ function updateScoreArea(){
 function updateScore(){
     scoreBlock.innerHTML = score;
 }
-//棋盘层
+//*棋盘层
 class GridDisplay {
     constructor(cParentNode) {
         this.canvas = document.createElement("canvas");
@@ -131,7 +150,7 @@ class GridDisplay {
         this.GridDrawing(this.canvas.width);
     }
 }
-//棋子
+//*棋子
 class Piece {
     constructor(num,GD) {
         this.num = num;
@@ -175,9 +194,8 @@ class Piece {
     }
 }
 //第二次初始化参数
-var gridDisplay = new GridDisplay(document.body);
-var g = new Grid(sideLength);
-//movePiece
+
+//*movePiece 动画
 function MovePiece(p1,tagetNum){ //传入p[num]棋子,移动的目标格，总时长
     let currentPosition = p1.TurnToPosition(p1.num);
     let lastPosition = p1.TurnToPosition(tagetNum);
@@ -246,33 +264,8 @@ function LocationFinder(a,b,c){
     else if (a.x<c.x) return{derection: "x",isBetween: false,sign: 1};
     else if (a.y<c.y) return{derection: "y",isBetween: false,sign: 1};
 }
-//随机生产3种颜色
-function RandomColor(n) {
-    let count = 0;
-    let randomNum = 0;
-    while (count != n) {
-        randomNum = parseInt(Math.random() * pieceColor.length + 1,10);
-        storeColor[count] = randomNum;
-        count += 1;
-        if (g.isEmpty == false) break;
-    }
-}
-//随机添加三颗棋子
-function RandomAddPiece(n) {
-    let count = 0;
-    let randomNum = 0;
-    while (count != n) {
-        randomNum = parseInt(Math.random() * 81,10);
-        if (g.block[randomNum].isFilled == false) {
-            p[randomNum] = new Piece(randomNum,gridDisplay);
-            p[randomNum].AddPiece(storeColor[count]);
-            Eliminate(randomNum);
-            count += 1;
-        }
-        if (g.isEmpty == false) break;
-    }
-}
-//消除
+
+//*消除
 function Eliminate(blockNum){
     let block = g.block;
     let s = sideLength;
@@ -332,6 +325,18 @@ var concat = (function(){
         return result;
     };
 }());
+var gridDisplay = new GridDisplay(document.body);
+//主执行函数
+(function () {
+    g.Start();
+    gridDisplay.start();
+    promptedArea.Start();
+    RandomColor(5);
+    RandomAddPiece(5);
+    resizeUpdateAll();//先更新下画面
+    AddEventListeners();//添加监听
+}());
+
 //监听
 function AddEventListeners() {
     function resizeListener() {
@@ -373,6 +378,7 @@ function resizeUpdateAll() {
     if ((window.innerWidth / window.innerHeight) >= sideLength / 16) isKeepWidth = true
     else isKeepWidth = false;
     updateScoreArea();
+    promptedArea.update();
     updateScore();
     gridDisplay.update();
     for (let i in p) {
@@ -393,13 +399,29 @@ function updateAll() {
         }
     }
 }
-//主执行函数
-(function () {
-    g.Start();
-    gridDisplay.start();
-    promptedAreaStart();
-    RandomColor(5);
-    RandomAddPiece(5);
-    resizeUpdateAll();//先更新下画面
-    AddEventListeners();//添加监听
-}());
+//随机生产3种颜色
+function RandomColor(n) {
+    let count = 0;
+    let randomNum = 0;
+    while (count != n) {
+        randomNum = parseInt(Math.random() * pieceColor.length + 1,10);
+        storeColor[count] = randomNum;
+        count += 1;
+        if (g.isEmpty == false) break;
+    }
+}
+//随机添加三颗棋子
+function RandomAddPiece(n) {
+    let count = 0;
+    let randomNum = 0;
+    while (count != n) {
+        randomNum = parseInt(Math.random() * 81,10);
+        if (g.block[randomNum].isFilled == false) {
+            p[randomNum] = new Piece(randomNum,gridDisplay);
+            p[randomNum].AddPiece(storeColor[count]);
+            Eliminate(randomNum);
+            count += 1;
+        }
+        if (g.isEmpty == false) break;
+    }
+}
