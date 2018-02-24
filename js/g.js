@@ -138,10 +138,8 @@ class Grid {
                 if (isEnd) {
                     i = blockNum2;
                     let arr = [];
-                    //var pathRecordPrint = blockNum2.toString();
                     while (pathRecord[i] != -1) {
                         arr.unshift(pathRecord[i]);
-                        //pathRecordPrint = (`${pathRecordPrint}-${pathRecord[i]}`);
                         i = pathRecord[i];
                     }
                     arr.push(blockNum2);

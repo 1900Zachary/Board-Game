@@ -1,7 +1,7 @@
 /// <reference path="g.js"/>
 //定义游戏属性
-const pieceColor = ["#ff0000","#ff80c0","#8000ff","#80ffff","#ff8000","#80ff00","#0000ff"];
-const theme = {background: "#46A7AF",blockDark: "#317E8A",blockLight: "#46A7AF",gridBackground: "#3A909A",gridShadow: "#00000099"};
+const pieceColor = ["#E26A6A","#F1C40F","#C0392D","#8E44AD","#2ECC71","#D35400","#2980D9"];
+const theme = {background: "#BDC3C7",blockDark: "#A0B0B0",blockLight: "#DDDDDD",gridBackground: "#BDC3C7",gridShadow: "#00000099"};
 const sideLength = 9;
 const speed = 18;
 //初始化基本参数
@@ -13,11 +13,39 @@ let saveN;
 var storeColor = [0,0,0];//
 //提示区
 //初始化
+var promptedAreaCanvas = document.createElement("canvas");
+if (promptedAreaCanvas.getContext) var promptedAreaContext = promptedAreaCanvas.getContext("2d");
 function promptedAreaStart(){
-    var promptedAreaCanvas = document.createElement("canvas");
-    if (promptedAreaCanvas.getContext) var promptedAreaContext = promptedAreaCanvas.getContext("2d");
     document.body.appendChild(promptedAreaCanvas);
+    updatepromptedArea();
 }
+function updatepromptedArea(){
+    let positionX,positionY;
+    if (isKeepWidth){
+        promptedAreaCanvas.style.width = `${window.innerHeight*9/16}px`;
+        promptedAreaCanvas.style.height = `${window.innerHeight*2/16}px`;
+        positionX = (window.innerWidth-window.innerHeight*9/16)/2;
+        positionY = (window.innerHeight*12.5/16);
+    }else{
+        console.log(window.innerWidth);
+        promptedAreaCanvas.style.width = `${window.innerWidth}px`;
+        promptedAreaCanvas.style.height = `${(window.innerHeight-window.innerWidth)*2/7}px`;
+        positionX = 0;
+        positionY = window.innerWidth+(window.innerHeight-window.innerWidth)/2;
+    }
+    promptedAreaCanvas.style.transform = `translate(${positionX}px,${positionY}px)`;
+    promptedAreaCanvas.appendChild(scoreBlock);
+    promptedAreaDraw();
+}
+
+function promptedAreaDraw(color,num){
+    // console.log(promptedAreaCanvas.style.height);
+    promptedAreaContext.fillStyle = color;
+    let positionX =  
+    promptedAreaContext.arc(100,100,30,0,Math.PI * 2,false);
+    promptedAreaContext.fill();
+}
+
 //分数区
 let scoreArea = document.getElementById("score_area");
 let scoreBlock = document.createElement("div");
