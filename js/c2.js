@@ -14,6 +14,8 @@ var storeColor = [0,0,0];//
 //提示区
 //初始化
 var promptedAreaCanvas = document.createElement("canvas");
+var promptedAreaWidth;
+var promptedAreaHeight;
 if (promptedAreaCanvas.getContext) var promptedAreaContext = promptedAreaCanvas.getContext("2d");
 function promptedAreaStart(){
     document.body.appendChild(promptedAreaCanvas);
@@ -22,34 +24,43 @@ function promptedAreaStart(){
 function updatepromptedArea(){
     let positionX,positionY;
     if (isKeepWidth){
-        promptedAreaCanvas.style.width = `${window.innerHeight*9/16}px`;
-        promptedAreaCanvas.style.height = `${window.innerHeight*2/16}px`;
+        promptedAreaWidth = window.innerHeight*9/16;
+        promptedAreaHeight = window.innerHeight*2/16;
         positionX = (window.innerWidth-window.innerHeight*9/16)/2;
         positionY = (window.innerHeight*12.5/16);
     }else{
         console.log(window.innerWidth);
-        promptedAreaCanvas.style.width = `${window.innerWidth}px`;
-        promptedAreaCanvas.style.height = `${(window.innerHeight-window.innerWidth)*2/7}px`;
+        promptedAreaWidth = window.innerWidth;
+        promptedAreaHeight = (window.innerHeight-window.innerWidth)*2/7;
         positionX = 0;
         positionY = window.innerWidth+(window.innerHeight-window.innerWidth)/2;
     }
+    promptedAreaCanvas.width = promptedAreaWidth;
+    promptedAreaCanvas.height = promptedAreaHeight;
     promptedAreaCanvas.style.transform = `translate(${positionX}px,${positionY}px)`;
-    promptedAreaCanvas.appendChild(scoreBlock);
-    promptedAreaDraw();
+    promptedAreaContext.clearRect(0,0,promptedAreaCanvas.width,promptedAreaCanvas.height);
 }
 
 function promptedAreaDraw(color,num){
-    // console.log(promptedAreaCanvas.style.height);
+    let w = promptedAreaWidth;
+    let h = promptedAreaHeight;
+    let r = h*0.3;
+    let positionX = (w-2*h)/2+num*0.65*h-r;
+    let positionY = h*0.5;
+    promptedAreaContext.beginPath();
+    promptedAreaContext.save();
+    promptedAreaContext.lineWidth = 0;
     promptedAreaContext.fillStyle = color;
-    let positionX =  
-    promptedAreaContext.arc(100,100,30,0,Math.PI * 2,false);
+    promptedAreaContext.arc(positionX,positionY,r,0,Math.PI * 2,false);
     promptedAreaContext.fill();
+    promptedAreaContext.restore();
+    promptedAreaContext.closePath();
 }
-
 //分数区
 let scoreArea = document.getElementById("score_area");
 let scoreBlock = document.createElement("div");
 function updateScoreArea(){
+    console.log("in");
     let positionX;
     if (isKeepWidth){
         scoreArea.style.width = `${window.innerHeight*9/16}px`;
@@ -70,6 +81,7 @@ function updateScoreArea(){
 
 }
 function updateScore(){
+    console.log("in");
     scoreBlock.innerHTML = score;
 }
 //棋盘层
@@ -256,6 +268,7 @@ function MovePiece(p1,tagetNum){ //传入p[num]棋子,移动的目标格，总�
 
             if (!Eliminate(tagetNum)){
                 RandomAddPiece(3);
+                updatepromptedArea();
                 RandomColor(3);
             }
         }
@@ -281,6 +294,7 @@ function RandomColor(n) {
     while (count != n) {
         randomNum = parseInt(Math.random() * pieceColor.length + 1,10);
         storeColor[count] = randomNum;
+        promptedAreaDraw(pieceColor[randomNum-1],count+1);
         count += 1;
         if (g.isEmpty == false) break;
     }
@@ -390,7 +404,6 @@ function ClickEvent(e){
             isSelected = false;
             p[tempN] = p[saveN];
             p[saveN]=0;
-
             updateAll();
         }
     }
@@ -402,6 +415,7 @@ function resizeUpdateAll() {
     else isKeepWidth = false;
     updateScoreArea();
     updateScore();
+    //updatepromptedArea();
     gridDisplay.update();
     for (let i in p) {
         if (p[i] != 0) {
@@ -425,9 +439,11 @@ function updateAll() {
 (function () {
     g.Start();
     gridDisplay.start();
-    promptedAreaStart();
     RandomColor(5);
     RandomAddPiece(5);
+    promptedAreaStart();
+    updatepromptedArea();
+    RandomColor(3);
     resizeUpdateAll();//先更新下画面
     AddEventListeners();//添加监听
 }());
