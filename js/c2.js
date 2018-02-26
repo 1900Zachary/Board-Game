@@ -10,8 +10,9 @@ var p = [...Array(80).fill(0)];
 let isSelected = false;
 var score=0;
 let saveN;
-var storeColor = [0,0,0];//
-//提示区
+var storeColor = [0,0,0];//储存颜色
+var g = new Grid(sideLength);
+//*提示区
 //初始化
 var promptedAreaCanvas = document.createElement("canvas");
 var promptedAreaWidth;
@@ -56,7 +57,7 @@ function promptedAreaDraw(color,num){
     promptedAreaContext.restore();
     promptedAreaContext.closePath();
 }
-//分数区
+//*分数区
 let scoreArea = document.getElementById("score_area");
 let scoreBlock = document.createElement("div");
 function updateScoreArea(){
@@ -65,7 +66,7 @@ function updateScoreArea(){
     if (isKeepWidth){
         scoreArea.style.width = `${window.innerHeight*9/16}px`;
         scoreArea.style.height = `${window.innerHeight*3.5/16}px`;
-        positionX = (window.innerWidth-window.innerHeight*9/16)/2;
+        positionX = (window.innerWidth-window.innerHeight*25)/32;
     }else{
         scoreArea.style.width = `${window.innerWidth}px`;
         scoreArea.style.height = `${(window.innerHeight-window.innerWidth)/2}px`;
@@ -84,7 +85,7 @@ function updateScore(){
     console.log("in");
     scoreBlock.innerHTML = score;
 }
-//棋盘层
+//*棋盘层
 class GridDisplay {
     constructor(cParentNode) {
         this.canvas = document.createElement("canvas");
@@ -171,7 +172,7 @@ class GridDisplay {
         this.GridDrawing(this.canvas.width);
     }
 }
-//棋子
+//*棋子
 class Piece {
     constructor(num,GD) {
         this.num = num;
@@ -215,9 +216,8 @@ class Piece {
     }
 }
 //第二次初始化参数
-var gridDisplay = new GridDisplay(document.body);
-var g = new Grid(sideLength);
-//movePiece
+
+//*movePiece 动画
 function MovePiece(p1,tagetNum){ //传入p[num]棋子,移动的目标格，总时长
     let currentPosition = p1.TurnToPosition(p1.num);
     let lastPosition = p1.TurnToPosition(tagetNum);
@@ -374,6 +374,18 @@ var concat = (function(){
         return result;
     };
 }());
+var gridDisplay = new GridDisplay(document.body);
+//主执行函数
+(function () {
+    g.Start();
+    gridDisplay.start();
+    promptedArea.Start();
+    RandomColor(5);
+    RandomAddPiece(5);
+    resizeUpdateAll();//先更新下画面
+    AddEventListeners();//添加监听
+}());
+
 //监听
 function AddEventListeners() {
     function resizeListener() {
@@ -414,6 +426,7 @@ function resizeUpdateAll() {
     if ((window.innerWidth / window.innerHeight) >= sideLength / 16) isKeepWidth = true
     else isKeepWidth = false;
     updateScoreArea();
+    promptedArea.update();
     updateScore();
     //updatepromptedArea();
     gridDisplay.update();

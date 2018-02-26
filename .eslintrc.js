@@ -235,7 +235,7 @@ module.exports = {
         "prefer-numeric-literals": "error",
         "prefer-promise-reject-errors": "error",
         "prefer-reflect": "error",
-        "prefer-rest-params": "error",
+        //"prefer-rest-params": "error",
         "prefer-spread": "error",
         "prefer-template": "error",
         //"quote-props": "error",
