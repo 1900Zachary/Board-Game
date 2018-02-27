@@ -58,7 +58,7 @@ function promptedAreaDraw(color,num){
 }
 //分数区
 let scoreArea = document.getElementById("score_area");
-let scoreBlock = document.createElement("div");
+let scoreBlock = document.getElementById("score");
 function updateScoreArea(){
     console.log("in");
     let positionX;
@@ -72,13 +72,7 @@ function updateScoreArea(){
         positionX = 0;
     }
     scoreArea.style.transform = `translateX(${positionX}px)`;
-    scoreArea.appendChild(scoreBlock);
-    scoreBlock.style.color = "white";
-    scoreBlock.style.position = "relative";
     scoreBlock.style.fontSize = window.innerHeight*3.5/16*0.6;
-    scoreBlock.style.bottom = "-50%";
-    scoreBlock.style.transform = "translateY(-50%)";
-
 }
 function updateScore(){
     console.log("in");

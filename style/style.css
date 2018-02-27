@@ -11,3 +11,14 @@ div {
     padding: 0;
     position: fixed;
 }
+#score{
+    color:white;
+    position: relative;
+    bottom: 50%;
+    /* transform: translateY(-50%); */
+    display: inline;
+}
+#reset{
+    position: relative;
+    float: right;
+}
