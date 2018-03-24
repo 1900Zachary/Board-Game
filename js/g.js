@@ -1,3 +1,4 @@
+//数据结构
 class Grid {
     constructor(sideLength) {
         //属性

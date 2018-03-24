@@ -1,32 +1,10 @@
 @charset "utf-8";
 /* CSS Document */
-html{
-    font-size:10px;
-}
 body {
     margin:0;
     width: 100vw;
     height: 100vh;
-    /* display:flex;
-    justify-content:center;
-	align-items:center; */
 }
-/* div {
-    margin:0;
-    padding: 0;
-    position: fixed;
-}
-#score{
-    color:white;
-    position: relative;
-    bottom: 50%;
-    transform: translateY(-50%);
-    display: inline;
-}
-#reset{
-    position: relative;
-    float: right;
-} */
 
 #MainFrame{
     width:100%;
@@ -69,9 +47,14 @@ body {
 
     display: flex;
     flex-direction: row;
+    justify-content:space-around;
+    align-items: center;
+
+    height: fit-content;
 }
 .icon{
     background:#aaa;
-    flex-grow: 1;
-    margin: 20px;
+    width: 12%;
+    height: 0;
+    padding-bottom: 12%
 }
