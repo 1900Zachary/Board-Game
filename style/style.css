@@ -18,6 +18,8 @@ body {
 #GameFrame {
     background-color: #333;
     width: 100%;
+}
+#GameContainer {
     height: 0;
     padding-top: 50%; 
     padding-bottom: 50%;
@@ -55,6 +57,11 @@ body {
 .icon{
     background:#aaa;
     width: 12%;
-    height: 0;
-    padding-bottom: 12%
+    /* height: 0;
+    padding-bottom: 12% */
+}
+.i{
+    display: block;
+    width: 100%;
+    padding-bottom:100%;
 }

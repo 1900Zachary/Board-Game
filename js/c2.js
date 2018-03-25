@@ -158,7 +158,7 @@ class GridDisplay {
         this.gridW = this.canvas.width * 0.94;
         this.gridPieceW = this.gridW / sideLength;
         this.frame = (this.canvas.width - this.gridW) / 2;
-        this.canvas.style.transform = `translate(${this.positionX}px,${this.positionY}px)`;
+        // this.canvas.style.transform = `translate(${this.positionX}px,${this.positionY}px)`;
         this.context.translate(-this.frame,-this.frame);
         this.clear();
         this.context.translate(this.frame,this.frame);
@@ -209,7 +209,7 @@ class Piece {
     }
 }
 //第二次初始化参数
-var gridDisplay = new GridDisplay(document.body);
+var gridDisplay = new GridDisplay(document.getElementById("GameContainer"));
 var g = new Grid(sideLength);
 //movePiece
 function MovePiece(p1,tagetNum){ //传入p[num]棋子,移动的目标格，总时长
