@@ -1,28 +1,49 @@
-(function(global,factory){
-    typeof exports === "object" && typeof module !== "undefined" ? factory(exports)
-        : typeof define === "function" && define.amd ? define(["exports"],factory)
-            : (factory((global.GRID = {})));
-}(this,((exports) => {
-    class Name {
-        constructor(name){
-            if (typeof this.InitBlockLink !== "function") {
-                Name.prototype.sayName = function(){
-                    console.log(name);
-                }
-            }
+(function(factory){
+    factory((this.GRID={}));
+}(((exports) => {
+    class Renderer{
+        constructor(width,height){
+            this.domElement = document.createElement("canvas");
+            this.setSize(width,height);
+            this.board = null;
+            if (this.domElement.getContext) this.context = this.domElement.getContext("2d");
+        }
+
+        add(object){
+            if (object.constructor.name === "Board") this.board = object;
+        }
+
+        setSize(width,height){
+            this.width = width;
+            this.height = height;
+            this.domElement.width = width;
+            this.domElement.height = height;
+        }
+
+        render(){
+            this.clearCanvas();
+            this.board.draw();
+        }
+
+        clearCanvas(){
+            this.context.clearRect(0,0,this.width,this.height)
         }
     }
-    exports.Name = Name;
-})))
 
-// class Name {
-//     constructor(name){
-//         if (typeof this.InitBlockLink !== "function") {
-//             name.prototype.sayName = function(){
-//                 console.log(name);
-//             }
-//         }
-//     }
-// }
-// var GRID = {}
-// gRID.Name = Name;
+    class Board{
+        constructor(side,width,height){
+            this.side = side;
+            this.width = width;
+            this.height = height;
+        }
+
+        setSize(width,height){
+            this.width = width;
+            this.height = height;
+        }
+    }
+
+    exports.Renderer = Renderer;
+    exports.Board = Board;
+
+})))
