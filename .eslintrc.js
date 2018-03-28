@@ -5,7 +5,8 @@ module.exports = {
     },
     "globals":{
         Grid:false,
-        initGrid:false
+        initGrid:false,
+        GRID:false,
     },
     "extends": "eslint:recommended",
     "rules": {
