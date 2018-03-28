@@ -6,5 +6,4 @@ var p = new GRID.Piece("#FF0000");
 GameContainer.appendChild(r.domElement);
 p.position.set(10,100);
 console.log(p.position);
-r.add(b);
-r.render();
+r.render(b);
