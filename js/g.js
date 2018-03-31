@@ -33,7 +33,7 @@ class Grid {
                         if ((j - 1) >= 0) this.block[i * sideLength + j].gridLink.push(i * sideLength + j - 1);
                         if ((i + 1) < sideLength) this.block[i * sideLength + j].gridLink.push((i + 1) * sideLength + j);
                         if ((j + 1) < sideLength) this.block[i * sideLength + j].gridLink.push(i * sideLength + j + 1);
-                        this.block[i * sideLength + j].gridLink.sort(ASC);
+                        this.block[i * sideLength + j].gridLink.sort(ASC);//从小大到排序
                     }
                 }
                 function ASC() {

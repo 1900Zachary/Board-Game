@@ -3,7 +3,7 @@ console.log(GameContainer.getBoundingClientRect().width);
 var r = new GRID.Renderer(GameContainer.clientWidth,GameContainer.clientHeight);
 var b = new GRID.Board(9);
 GameContainer.appendChild(r.domElement);
-b.setColor("a","b","c");
+b.setColor("#E26A6A","#F1C40F","#C0392D","#8E44AD","#2ECC71","#D35400","#2980D9");
 b.randomColor(5);
 b.addPiece(5);
 console.log(b.piece);

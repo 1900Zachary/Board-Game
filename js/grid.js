@@ -7,13 +7,23 @@
             this.board = new Board(0);
             this.setSize(width,height);
             if (this.domElement.getContext) this.context = this.domElement.getContext("2d");
+            this.listener(this.domElement);
         }
 
+        listener(eventTarget){
+            let x,y;
+            eventTarget.addEventListener("click",(e) => {
+                x = e.x - parseInt(eventTarget.getBoundingClientRect().left,10);
+                y = e.y - parseInt(eventTarget.getBoundingClientRect().top,10);
+                this.board.action(x,y);
+            });    
+        }
+        
         add(object){
             if (object.constructor.name === "Board") {
                 this.board = object;
-                this.board.setSize(this.width,this.height);
-                object.context = this.context;
+                object.setSize(this.width,this.height);
+                object.setContext(this.context);
             }
         }
 
@@ -44,6 +54,22 @@
             this.data = new boardData(this.side);
             this.color = [];
             this.tempColor = [];
+            this.pieceRadius = 0;
+        }
+
+        action(x,y){
+            let num = parseInt(y/this.squareLength,10)*this.side + parseInt(x/this.squareLength,10);
+            console.log(num);
+        }
+
+        setContext(context){
+            let i;
+            this.context = context;
+            for(i=0;i< this.side * this.side ;i++){
+                if (this.data.square[i].isFilled){
+                    this.piece[i].context = this.context;
+                }
+            }
         }
 
         setColor(){
@@ -53,8 +79,17 @@
         }
 
         setSize(width,height){
+            let i;
             this.width = width;
             this.height = height;
+            this.squareLength = this.width / this.side;
+            this.pieceRadius = this.squareLength * 0.45;
+            for(i=0;i< this.side * this.side ;i++){
+                if (this.data.square[i].isFilled){
+                    this.piece[i].radius = this.pieceRadius;
+                    this.piece[i].position.set(this.data.square[this.piece[i].num].position.x*this.squareLength+this.squareLength/2,this.data.square[this.piece[i].num].position.y*this.squareLength+this.squareLength/2);
+                }
+            }
         }
         
         addPiece(n){
@@ -64,7 +99,7 @@
                 tempNum = this.data.randomNum();
                 this.piece[tempNum] = new Piece(tempNum,this.tempColor[i]);
                 this.data.addPiece(tempNum); //更新data
-                this.initPiecePosition(this.piece[tempNum]); //初始化棋子相对画布坐标
+                
             }
         }
 
@@ -78,14 +113,15 @@
             }
         }
 
-        initPiecePosition(piece){
-            let squareLength = this.width / this.side ;
-            piece.position.set(this.data.square[piece.num].position.x*squareLength+squareLength/2,this.data.square[piece.num].position.y*squareLength+squareLength/2);
-        }
-
         draw(){
+            let i=0;
             this.context.fillStyle = "#dddddd";
             this.context.fillRect(0,0,this.width,this.height);
+            for(i=0;i< this.side * this.side ;i++){
+                if (this.data.square[i].isFilled){
+                    this.piece[i].draw();
+                }
+            }
         }
     }
 
@@ -98,6 +134,25 @@
                 this.y = y;
             }
             this.num = num;
+            this.context = null;
+            this.radius = null;
+        }
+
+        draw(){
+            this.context.beginPath();
+            this.context.save();
+            this.context.fillStyle = this.color;
+            this.context.shadowColor = "#00000099";
+            this.context.shadowBlur = 15;
+            this.context.arc(this.position.x,this.position.y,this.radius,0,Math.PI * 2,false);
+            this.context.fill();
+            this.context.restore();
+            this.context.closePath();
+        }
+
+        selectSwitch(){
+            if (this.select) this.select = false;
+            else this.select = true;
         }
     }
 
