@@ -55,11 +55,38 @@
             this.color = [];
             this.tempColor = [];
             this.pieceRadius = 0;
+            this.tempSelectedNum = -1;
         }
 
         action(x,y){
+            let i;
             let num = parseInt(y/this.squareLength,10)*this.side + parseInt(x/this.squareLength,10);
-            console.log(num);
+            if (typeof this.piece[num] === "object") {
+                if (this.piece[num].select === false) {
+                    for(i=0;i< this.side * this.side ;i++){
+                        if (this.data.square[i].isFilled){
+                            this.piece[i].select = false;
+                        }
+                    }//初始化
+                    this.piece[num].selectSwitch();
+                }else console.log(`piece[${num}] was selected`);
+            }else if (typeof this.piece[this.tempSelectedNum] === "object") {
+                if (this.piece[this.tempSelectedNum].select) {
+                    this.movePiece(this.tempSelectedNum,num);
+                    console.log(`square[${num}] is empty`);
+                }
+            }
+            this.tempSelectedNum = num;
+        }
+
+        movePiece(num1,num2){
+            // console.log(`move piece ${num1} to ${num2}`);
+            this.data.deletePiece(num1);
+            let currentPosition = this.num2Position(num1);//当前坐标
+            let endPostion = this.num2Position(num2);     //终点坐标
+            let routePoint = this.data.BFS(num1,num2);
+            
+            console.log(routePoint);
         }
 
         setContext(context){
@@ -87,9 +114,15 @@
             for(i=0;i< this.side * this.side ;i++){
                 if (this.data.square[i].isFilled){
                     this.piece[i].radius = this.pieceRadius;
-                    this.piece[i].position.set(this.data.square[this.piece[i].num].position.x*this.squareLength+this.squareLength/2,this.data.square[this.piece[i].num].position.y*this.squareLength+this.squareLength/2);
+                    this.piece[i].position.set(this.num2Position(i)[0],this.num2Position(i)[1]);
                 }
             }
+        }
+
+        num2Position(num){
+            let x = (num%this.side)*this.squareLength+this.squareLength/2;
+            let y = parseInt(num/this.side,10)*this.squareLength+this.squareLength/2;
+            return [x,y];
         }
         
         addPiece(n){
@@ -136,6 +169,7 @@
             this.num = num;
             this.context = null;
             this.radius = null;
+            this.select = false;
         }
 
         draw(){
@@ -170,7 +204,6 @@
             let squareNum;
             for (squareNum = 0; squareNum < this.squareSum; squareNum++){ //初始化
                 square[squareNum] = {
-                    color: 0,
                     gridLink: [],
                     isFilled: false,
                     position: {x: squareNum % side,y: parseInt(squareNum / side,10)}
@@ -196,18 +229,18 @@
         isEmpty(){
             let i;
             let isEmpty;
-            for (i = 0; i < this.blockSum; i++) {
-                if (this.block[i].isFilled == false) {
+            for (i = 0; i < this.squareSum; i++) {
+                if (this.square[i].isFilled == false) {
                     isEmpty = true;
                     break;
                 }
             }
-            if (i == this.blockSum) isEmpty = false;
+            if (i == this.squareSum) isEmpty = false;
             return isEmpty;
         }
 
-        Arrive(blockNum1,blockNum2){
-            let temp = this.BFS(blockNum1,blockNum2);
+        Arrive(squareNum1,squareNum2){
+            let temp = this.BFS(squareNum1,squareNum2);
             if (temp.length === 0) return false;
             else return true;
         }
@@ -237,9 +270,9 @@
             this.square[squareNum].isFilled = false;
             let temp = this.square[squareNum].gridLink;
             if (this.square[squareNum].position.x-1>=0) temp.push(squareNum - 1);
-            if (this.square[squareNum].position.x+1<this.sideLength) temp.push(squareNum + 1);
-            if (this.square[squareNum].position.y-1>=0) temp.push(squareNum - this.sideLength);
-            if (this.square[squareNum].position.y+1<this.sideLength) temp.push(squareNum + this.sideLength);
+            if (this.square[squareNum].position.x+1<this.side) temp.push(squareNum + 1);
+            if (this.square[squareNum].position.y-1>=0) temp.push(squareNum - this.side);
+            if (this.square[squareNum].position.y+1<this.side) temp.push(squareNum + this.side);
             temp.sort((a,b) => a-b);//从小到大排序
             for (i = 0; i < temp.length; i++) {
                 this.square[temp[i]].gridLink.push(squareNum);
@@ -263,7 +296,7 @@
             while (!isEnd) {
                 //确定首元素链接列表
                 if(typeof (this.square[tempQ[0]]) !=="undefined" && tempQ[0].length !==0) currentSquareLinks = this.square[tempQ[0]].gridLink;
-                else { 
+                else {
                     console.log("This piece can't get there.");
                     break; 
                 }
@@ -291,7 +324,7 @@
                     i = pathRecord[i];
                 }
                 arr.push(squareNum2);
-                console.log(arr);
+                // console.log(arr);
                 return arr;
             } else {
                 return [];
