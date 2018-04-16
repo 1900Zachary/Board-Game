@@ -80,13 +80,32 @@
         }
 
         movePiece(num1,num2){
+            function LocationFinder(a,b,c){
+                if (a.x>c.x||a.y>c.y){
+                    if (a.x>=b.x&&b.x>c.x&&a.y==c.y) return {derection: "x",isBetween: true,sign: -1};
+                    else if (a.y>=b.y&&b.y>c.y&&a.x==c.x) return {derection: "y",isBetween: true,sign: -1};
+                    else if (a.x>c.x) return {derection: "x",isBetween: false,sign: -1};
+                    else if (a.y>c.y) return {derection: "y",isBetween: false,sign: -1};
+                }else if (a.x<=b.x&&b.x<c.x&&a.y==c.y) return{derection: "x",isBetween: true,sign: 1};
+                else if (a.y<=b.y&&b.y<c.y&&a.x==c.x) return{derection: "y",isBetween: true,sign: 1};
+                else if (a.x<c.x) return{derection: "x",isBetween: false,sign: 1};
+                else if (a.y<c.y) return{derection: "y",isBetween: false,sign: 1};
+            }
             // console.log(`move piece ${num1} to ${num2}`);
             this.data.deletePiece(num1);
             let currentPosition = this.num2Position(num1);//当前坐标
             let endPostion = this.num2Position(num2);     //终点坐标
-            let routePoint = this.data.BFS(num1,num2);
-            
-            console.log(routePoint);
+            let piecePath = this.data.BFS(num1,num2);    //路径 
+            let pieceKeyPath = [];
+            let temp;
+            for (let i = 0;i<piecePath.length;i++){
+                temp = LocationFinder(this.num2Position(piecePath[i-1]),this.num2Position(piecePath[i]),this.num2Position(piecePath[i+1]));
+                if (i ==0||i==piecePath.length-1) pieceKeyPath.push(this.num2Position(piecePath[i]));
+                else if (!temp.isBetween) pieceKeyPath.push(this.num2Position(piecePath[i]));
+            }
+            console.log(piecePath);
+            console.log(pieceKeyPath);
+
         }
 
         setContext(context){
@@ -114,7 +133,7 @@
             for(i=0;i< this.side * this.side ;i++){
                 if (this.data.square[i].isFilled){
                     this.piece[i].radius = this.pieceRadius;
-                    this.piece[i].position.set(this.num2Position(i)[0],this.num2Position(i)[1]);
+                    this.piece[i].position.set(this.num2Position(i).x,this.num2Position(i).y);
                 }
             }
         }
@@ -122,7 +141,7 @@
         num2Position(num){
             let x = (num%this.side)*this.squareLength+this.squareLength/2;
             let y = parseInt(num/this.side,10)*this.squareLength+this.squareLength/2;
-            return [x,y];
+            return {x: x,y: y};
         }
         
         addPiece(n){
