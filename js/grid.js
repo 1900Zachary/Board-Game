@@ -5,20 +5,12 @@
         constructor(width,height){
             this.domElement = document.createElement("canvas");
             this.board = new Board(0);
+            this.boardExsit = false;
             this.setSize(width,height);
             if (this.domElement.getContext) this.context = this.domElement.getContext("2d");
-            this.listener(this.domElement);
+            // this.listener(this.domElement);
         }
 
-        listener(eventTarget){
-            let x,y;
-            eventTarget.addEventListener("click",(e) => {
-                x = e.x - parseInt(eventTarget.getBoundingClientRect().left,10);
-                y = e.y - parseInt(eventTarget.getBoundingClientRect().top,10);
-                this.board.action(x,y);
-            });    
-        }
-        
         add(object){
             if (object.constructor.name === "Board") {
                 this.board = object;
@@ -37,7 +29,10 @@
 
         render(board){
             this.clearCanvas();
-            this.add(board);
+            if (this.boardExsit == false) { 
+                this.add(board);
+                this.boardExsit = true;
+            }
             this.board.draw();
         }
 
@@ -56,56 +51,6 @@
             this.tempColor = [];
             this.pieceRadius = 0;
             this.tempSelectedNum = -1;
-        }
-
-        action(x,y){
-            let i;
-            let num = parseInt(y/this.squareLength,10)*this.side + parseInt(x/this.squareLength,10);
-            if (typeof this.piece[num] === "object") {
-                if (this.piece[num].select === false) {
-                    for(i=0;i< this.side * this.side ;i++){
-                        if (this.data.square[i].isFilled){
-                            this.piece[i].select = false;
-                        }
-                    }//初始化
-                    this.piece[num].selectSwitch();
-                }else console.log(`piece[${num}] was selected`);
-            }else if (typeof this.piece[this.tempSelectedNum] === "object") {
-                if (this.piece[this.tempSelectedNum].select) {
-                    this.movePiece(this.tempSelectedNum,num);
-                    console.log(`square[${num}] is empty`);
-                }
-            }
-            this.tempSelectedNum = num;
-        }
-
-        movePiece(num1,num2){
-            function LocationFinder(a,b,c){
-                if (a.x>c.x||a.y>c.y){
-                    if (a.x>=b.x&&b.x>c.x&&a.y==c.y) return {derection: "x",isBetween: true,sign: -1};
-                    else if (a.y>=b.y&&b.y>c.y&&a.x==c.x) return {derection: "y",isBetween: true,sign: -1};
-                    else if (a.x>c.x) return {derection: "x",isBetween: false,sign: -1};
-                    else if (a.y>c.y) return {derection: "y",isBetween: false,sign: -1};
-                }else if (a.x<=b.x&&b.x<c.x&&a.y==c.y) return{derection: "x",isBetween: true,sign: 1};
-                else if (a.y<=b.y&&b.y<c.y&&a.x==c.x) return{derection: "y",isBetween: true,sign: 1};
-                else if (a.x<c.x) return{derection: "x",isBetween: false,sign: 1};
-                else if (a.y<c.y) return{derection: "y",isBetween: false,sign: 1};
-            }
-            // console.log(`move piece ${num1} to ${num2}`);
-            this.data.deletePiece(num1);
-            let currentPosition = this.num2Position(num1);//当前坐标
-            let endPostion = this.num2Position(num2);     //终点坐标
-            let piecePath = this.data.BFS(num1,num2);    //路径 
-            let pieceKeyPath = [];
-            let temp;
-            for (let i = 0;i<piecePath.length;i++){
-                temp = LocationFinder(this.num2Position(piecePath[i-1]),this.num2Position(piecePath[i]),this.num2Position(piecePath[i+1]));
-                if (i ==0||i==piecePath.length-1) pieceKeyPath.push(this.num2Position(piecePath[i]));
-                else if (!temp.isBetween) pieceKeyPath.push(this.num2Position(piecePath[i]));
-            }
-            console.log(piecePath);
-            console.log(pieceKeyPath);
-
         }
 
         setContext(context){
@@ -153,6 +98,11 @@
                 this.data.addPiece(tempNum); //更新data
                 
             }
+        }
+
+        deletePiece(num){
+            this.piece[num] = null;
+            this.data.deletePiece(num);
         }
 
         randomColor(n){
