@@ -8,7 +8,6 @@
             this.boardExsit = false;
             this.setSize(width,height);
             if (this.domElement.getContext) this.context = this.domElement.getContext("2d");
-            // this.listener(this.domElement);
         }
 
         add(object){
@@ -50,7 +49,6 @@
             this.color = [];
             this.tempColor = [];
             this.pieceRadius = 0;
-            this.tempSelectedNum = -1;
         }
 
         setContext(context){
@@ -101,7 +99,7 @@
         }
 
         deletePiece(num){
-            this.piece[num] = null;
+            this.piece[num] = undefined;
             this.data.deletePiece(num);
         }
 
@@ -235,13 +233,14 @@
         }
 
         deletePiece(squareNum){
+            //将第 squareNum 格设为空，将其上下左右格，存在且空的，加入其连接图中。
             let i=0;
             this.square[squareNum].isFilled = false;
             let temp = this.square[squareNum].gridLink;
-            if (this.square[squareNum].position.x-1>=0) temp.push(squareNum - 1);
-            if (this.square[squareNum].position.x+1<this.side) temp.push(squareNum + 1);
-            if (this.square[squareNum].position.y-1>=0) temp.push(squareNum - this.side);
-            if (this.square[squareNum].position.y+1<this.side) temp.push(squareNum + this.side);
+            if (this.square[squareNum].position.x-1>=0 && this.square[squareNum-1].isFilled===false) temp.push(squareNum - 1);
+            if (this.square[squareNum].position.x+1<this.side && this.square[squareNum+1].isFilled===false) temp.push(squareNum + 1);
+            if (this.square[squareNum].position.y-1>=0 && this.square[squareNum+this.side].isFilled===false) temp.push(squareNum - this.side);
+            if (this.square[squareNum].position.y+1<this.side && this.square[squareNum+this.side].isFilled===false) temp.push(squareNum + this.side);
             temp.sort((a,b) => a-b);//从小到大排序
             for (i = 0; i < temp.length; i++) {
                 this.square[temp[i]].gridLink.push(squareNum);
@@ -293,7 +292,7 @@
                     i = pathRecord[i];
                 }
                 arr.push(squareNum2);
-                // console.log(arr);
+                console.log(arr);
                 return arr;
             } else {
                 return [];

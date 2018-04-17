@@ -14,9 +14,11 @@ renderer.domElement.addEventListener("click",(e) => {
     action(x,y);
 });
 
+let tempSelectedNum = -1;
 function action(x,y){
     let i;
     let num = parseInt(y/board.squareLength,10)*board.side + parseInt(x/board.squareLength,10);
+    console.log(board.piece[num]);
     if (typeof board.piece[num] === "object") {
         if (board.piece[num].select === false) {
             for(i=0;i< board.side * board.side ;i++){
@@ -25,14 +27,15 @@ function action(x,y){
                 }
             }//初始化
             board.piece[num].selectSwitch();
+            console.log(`piece[${num}] is selected`)
         }else console.log(`piece[${num}] was selected`);
-    }else if (typeof board.piece[board.tempSelectedNum] === "object") {
-        if (board.piece[board.tempSelectedNum].select) {
-            movePiece(board.tempSelectedNum,num);
+    }else if (typeof board.piece[tempSelectedNum] === "object") {
+        if (board.piece[tempSelectedNum].select) {
+            movePiece(tempSelectedNum,num);
             console.log(`square[${num}] is empty`);
         }
     }
-    board.tempSelectedNum = num;
+    tempSelectedNum = num;
 }
 
 function movePiece(num1,num2){
@@ -69,12 +72,15 @@ function movePiece(num1,num2){
             }
         }
         board.piece[num1].position = currentPosition;
-        console.log(board.piece[num1].position);
 
         if (currentPosition.x!=endPostion.x||currentPosition.y!=endPostion.y){
             m2 = setTimeout(m,16.7);
         }else {
             clearTimeout(m2);
+            board.piece[num2] = board.piece[num1];
+            board.deletePiece(num1);
+            board.data.addPiece(num2);
+            tempSelectedNum = -1;
         }
     }())
 }
