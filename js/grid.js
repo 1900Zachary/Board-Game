@@ -4,18 +4,8 @@
     class Renderer{//-Renderer类，渲染
         constructor(width,height){
             this.domElement = document.createElement("canvas");
-            this.board = new Board(0);
-            this.boardExsit = false;
             this.setSize(width,height);
             if (this.domElement.getContext) this.context = this.domElement.getContext("2d");
-        }
-
-        add(object){
-            if (object.constructor.name === "Board") {
-                this.board = object;
-                object.setSize(this.width,this.height);
-                object.setContext(this.context);
-            }
         }
 
         setSize(width,height){
@@ -23,16 +13,13 @@
             this.height = height;
             this.domElement.width = width;
             this.domElement.height = height;
-            this.board.setSize(this.width,this.height);
         }
 
         render(board){
             this.clearCanvas();
-            if (this.boardExsit == false) { 
-                this.add(board);
-                this.boardExsit = true;
-            }
-            this.board.draw();
+            board.setSize(this.width,this.height);
+            board.setContext(this.context);
+            board.draw();
         }
 
         clearCanvas(){
@@ -49,6 +36,7 @@
             this.color = [];
             this.tempColor = [];
             this.pieceRadius = 0;
+            this.isMoving = false;
         }
 
         setContext(context){
@@ -74,7 +62,7 @@
             this.squareLength = this.width / this.side;
             this.pieceRadius = this.squareLength * 0.45;
             for(i=0;i< this.side * this.side ;i++){
-                if (this.data.square[i].isFilled){
+                if (this.data.square[i].isFilled&& this.isMoving===false){
                     this.piece[i].radius = this.pieceRadius;
                     this.piece[i].position.set(this.num2Position(i).x,this.num2Position(i).y);
                 }
@@ -94,7 +82,6 @@
                 tempNum = this.data.randomNum();
                 this.piece[tempNum] = new Piece(tempNum,this.tempColor[i]);
                 this.data.addPiece(tempNum); //更新data
-                
             }
         }
 
@@ -239,7 +226,7 @@
             let temp = this.square[squareNum].gridLink;
             if (this.square[squareNum].position.x-1>=0 && this.square[squareNum-1].isFilled===false) temp.push(squareNum - 1);
             if (this.square[squareNum].position.x+1<this.side && this.square[squareNum+1].isFilled===false) temp.push(squareNum + 1);
-            if (this.square[squareNum].position.y-1>=0 && this.square[squareNum+this.side].isFilled===false) temp.push(squareNum - this.side);
+            if (this.square[squareNum].position.y-1>=0 && this.square[squareNum-this.side].isFilled===false) temp.push(squareNum - this.side);
             if (this.square[squareNum].position.y+1<this.side && this.square[squareNum+this.side].isFilled===false) temp.push(squareNum + this.side);
             temp.sort((a,b) => a-b);//从小到大排序
             for (i = 0; i < temp.length; i++) {
@@ -255,6 +242,11 @@
             let pathRecord = []; //记录路径
             let isEnd = false; //是否寻找到目标点
             let i=0;
+            let deleteTag = false;
+            if (this.square[squareNum1].isFilled) {
+                this.deletePiece(squareNum1);
+                deleteTag = true;
+            }
             for (i = 0; i < this.squareSum; i++) {
                 visited[i] = false;
                 pathRecord[i] = -1;
@@ -283,6 +275,10 @@
                 } //将链接列表加入TempQ
                 tempQ.shift(); //将tempQ首元素出列
             }
+            if(deleteTag){
+                this.addPiece(squareNum1);
+                deleteTag = false;
+            }
             //打印路径
             if (isEnd) {
                 i = squareNum2;
@@ -292,7 +288,6 @@
                     i = pathRecord[i];
                 }
                 arr.push(squareNum2);
-                console.log(arr);
                 return arr;
             } else {
                 return [];
