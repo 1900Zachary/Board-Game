@@ -8,6 +8,7 @@
             if (this.domElement.getContext) this.context = this.domElement.getContext("2d");
         }
 
+        //设置宽高，并设置dom元素宽高
         setSize(width,height){
             this.width = width;
             this.height = height;
@@ -15,15 +16,57 @@
             this.domElement.height = height;
         }
 
-        render(board){
+        //渲染page
+        render(page){
             this.clearCanvas();
-            board.setSize(this.width,this.height);
-            board.setContext(this.context);
-            board.draw();
+            page.setSize(this.width,this.height);
+            page.setContext(this.context);
+            page.draw();
         }
 
+        //清除page
         clearCanvas(){
             this.context.clearRect(0,0,this.width,this.height)
+        }
+    }
+
+    class NextBalls{
+        constructor(){
+            this.colorStore = [];
+        }
+
+        setSize(w,h){
+            this.width = w;
+            this.height = h;
+            this.radius = h/3;
+        }
+
+        setContext(context){
+            this.context = context;
+        }
+
+        draw(){
+            this.context.beginPath();
+            this.context.save();
+            this.context.fillStyle = this.colorStore[0];
+            this.context.arc(this.width/2-this.radius*3,this.height/2,this.radius,0,Math.PI * 2,false);
+            this.context.fill();
+            this.context.restore();
+            this.context.closePath();
+            this.context.beginPath();
+            this.context.save();
+            this.context.fillStyle = this.colorStore[1];
+            this.context.arc(this.width/2,this.height/2,this.radius,0,Math.PI * 2,false);
+            this.context.fill();
+            this.context.restore();
+            this.context.closePath();
+            this.context.beginPath();
+            this.context.save();
+            this.context.fillStyle = this.colorStore[2];
+            this.context.arc(this.width/2+this.radius*3,this.height/2,this.radius,0,Math.PI * 2,false);
+            this.context.fill();
+            this.context.restore();
+            this.context.closePath();
         }
     }
 
@@ -37,6 +80,8 @@
             this.tempColor = [];
             this.pieceRadius = 0;
             this.isMoving = false;
+            this.isFull = false;
+            this.randomPosStore = [];
         }
 
         setContext(context){
@@ -75,13 +120,21 @@
             return {x: x,y: y};
         }
         
+        //在随机位置添加3个颜色队列里的棋子
         addPiece(n){
             let i;
             let tempNum;
+            this.randomPosStore = [];
             for (i = 0; i<n; i++){
-                tempNum = this.data.randomNum();
-                this.piece[tempNum] = new Piece(tempNum,this.tempColor[i]);
-                this.data.addPiece(tempNum); //更新data
+                if (this.data.isEmpty){
+                    tempNum = this.data.randomNum();
+                    this.randomPosStore.push(tempNum);
+                    this.piece[tempNum] = new Piece(tempNum,this.tempColor[i]);
+                    this.data.addPiece(tempNum); //更新data
+                }else{
+                    this.isFull = true;
+                    break;
+                }
             }
         }
 
@@ -219,6 +272,7 @@
             this.square[squareNum].gridLink = [];
         }
 
+        //删除棋子,更新链接表
         deletePiece(squareNum){
             //将第 squareNum 格设为空，将其上下左右格，存在且空的，加入其连接图中。
             let i=0;
@@ -235,6 +289,7 @@
             }
         }
 
+        //广度搜索
         BFS(squareNum1,squareNum2){
             let tempQ = [];
             let currentSquareLinks;
@@ -298,5 +353,6 @@
     //输出类
     exports.Renderer = Renderer;
     exports.Board = Board;
+    exports.NextBalls = NextBalls;
 
 })))

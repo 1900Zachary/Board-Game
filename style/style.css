@@ -36,10 +36,11 @@ body {
     display: flex;
     flex-direction: column;
 }
-#NextBallFrame {
+#NextBallsFrame {
     background-color: #ccc;
     flex-grow:1.5;
     flex-basis: 0;
+    overflow: hidden;
 }
 
 #IconsContainer{

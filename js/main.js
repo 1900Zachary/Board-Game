@@ -1,6 +1,9 @@
 var GameContainer = document.getElementById("GameContainer");
+var nextBallsFrame = document.getElementById("NextBallsFrame");
 var renderer = new GRID.Renderer(GameContainer.clientWidth,GameContainer.clientHeight);
+var renderer2 = new GRID.Renderer(nextBallsFrame.clientWidth,nextBallsFrame.clientHeight);
 var board = new GRID.Board(9);
+var nextBalls = new GRID.NextBalls();
 let tempSelectedNum = -1;
 let animateTag;
 let score=0;
@@ -10,11 +13,12 @@ listener(); //监听
 
 function init(){
     GameContainer.appendChild(renderer.domElement);
+    nextBallsFrame.appendChild(renderer2.domElement);
     board.setColor("#E26A6A","#F1C40F","#C0392D","#8E44AD","#2ECC71","#D35400","#2980D9");
     board.randomColor(5);
     board.addPiece(5);
     board.randomColor(3);
-    console.log(board);
+    nextBalls.colorStore = board.tempColor;
 }
 
 function listener(){
@@ -25,6 +29,7 @@ function listener(){
     });
 }
 
+//点击事件触发-逻辑
 function action(x,y){
     let i;
     let num = parseInt(y/board.squareLength,10)*board.side + parseInt(x/board.squareLength,10);
@@ -44,9 +49,14 @@ function action(x,y){
             let moveT = setInterval(() => {
                 if (board.isMoving === false){
                     board.piece[num].selectSwitch();
+                    tempSelectedNum = -1;
                     if (Eliminate(num) == false){
                         board.addPiece(3);
+                        for(i=0;i<board.randomPosStore.length;i++){
+                            Eliminate(board.randomPosStore[i]);
+                        }
                         board.randomColor(3);
+                        nextBalls.colorStore = board.tempColor;
                         animate();
                     }else{
                         animate();
@@ -103,7 +113,6 @@ function movePiece(num1,num2){
             board.piece[num2] = board.piece[num1];
             board.deletePiece(num1);
             board.data.addPiece(num2);
-            tempSelectedNum = -1;
         }
     }())
 }
@@ -181,10 +190,12 @@ var concat = (function(){
         return result;
     };
 }());
+//渲染
 function render(){
     renderer.render(board);
+    renderer2.render(nextBalls);
 }
-
+//动画
 function animate(){
     if (board.isMoving) animateTag = requestAnimationFrame(animate);
     else cancelAnimationFrame(animateTag);
