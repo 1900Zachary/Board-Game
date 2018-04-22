@@ -4,16 +4,21 @@
     class Renderer{//-Renderer类，渲染
         constructor(width,height){
             this.domElement = document.createElement("canvas");
-            this.setSize(width,height);
+            this.devicePixelRatio = window.devicePixelRatio || 1;
+            this.ratio = devicePixelRatio;
             if (this.domElement.getContext) this.context = this.domElement.getContext("2d");
+            this.setSize(width,height);
         }
 
         //设置宽高，并设置dom元素宽高
         setSize(width,height){
             this.width = width;
             this.height = height;
-            this.domElement.width = width;
-            this.domElement.height = height;
+            this.domElement.width = width*this.ratio;
+            this.domElement.height = height*this.ratio;
+            this.domElement.style.width = width + "px";
+            this.domElement.style.height = height + "px";
+            this.context.scale(this.ratio,this.ratio);
         }
 
         //渲染page
@@ -47,25 +52,19 @@
 
         draw(){
             this.context.beginPath();
-            this.context.save();
             this.context.fillStyle = this.colorStore[0];
             this.context.arc(this.width/2-this.radius*3,this.height/2,this.radius,0,Math.PI * 2,false);
             this.context.fill();
-            this.context.restore();
             this.context.closePath();
             this.context.beginPath();
-            this.context.save();
             this.context.fillStyle = this.colorStore[1];
             this.context.arc(this.width/2,this.height/2,this.radius,0,Math.PI * 2,false);
             this.context.fill();
-            this.context.restore();
             this.context.closePath();
             this.context.beginPath();
-            this.context.save();
             this.context.fillStyle = this.colorStore[2];
             this.context.arc(this.width/2+this.radius*3,this.height/2,this.radius,0,Math.PI * 2,false);
             this.context.fill();
-            this.context.restore();
             this.context.closePath();
         }
     }

@@ -7,6 +7,13 @@ var nextBalls = new GRID.NextBalls();
 let tempSelectedNum = -1;
 let animateTag;
 let score=0;
+var scoreFrame = document.getElementById("ScoreFrame");
+scoreFrame.textContent = score;
+//禁用触摸滑动，针对微信
+document.body.addEventListener("touchmove",(e) => {
+    e.preventDefault();
+})
+
 init(); //初始化
 animate();//动画
 listener(); //监听
@@ -33,7 +40,7 @@ function listener(){
 function action(x,y){
     let i;
     let num = parseInt(y/board.squareLength,10)*board.side + parseInt(x/board.squareLength,10);
-    if (typeof board.piece[num] === "object") {
+    if (typeof board.piece[num] === "object") { //棋盘num有棋子么？
         if (board.piece[num].select === false) {
             for(i=0;i< board.side * board.side ;i++){
                 if (board.data.square[i].isFilled){
@@ -43,9 +50,12 @@ function action(x,y){
             board.piece[num].selectSwitch();
             console.log(`piece[${num}] is selected`)
         }else console.log(`piece[${num}] was selected`);
-    }else if (typeof board.piece[tempSelectedNum] === "object") {
-        if (board.piece[tempSelectedNum].select&& board.isMoving===false&&board.data.Arrive(tempSelectedNum,num)) {
-            movePiece(tempSelectedNum,num);
+    }else if (typeof board.piece[tempSelectedNum] === "object") { //之前选择的棋盘有棋子么
+        let pathStore = board.data.BFS(tempSelectedNum,num);
+        let arrive = true;
+        if(pathStore.length===0) arrive = false;
+        if (board.piece[tempSelectedNum].select && tempSelectedNum>-1 && board.isMoving===false&&arrive) {
+            movePiece(tempSelectedNum,num,pathStore);
             let moveT = setInterval(() => {
                 if (board.isMoving === false){
                     board.piece[num].selectSwitch();
@@ -55,11 +65,13 @@ function action(x,y){
                         for(i=0;i<board.randomPosStore.length;i++){
                             Eliminate(board.randomPosStore[i]);
                         }
+                        scoreFrame.textContent = score;
                         board.randomColor(3);
                         nextBalls.colorStore = board.tempColor;
                         animate();
                     }else{
                         animate();
+                        scoreFrame.textContent = score;
                     }
                     clearInterval(moveT);
                 }
@@ -70,11 +82,11 @@ function action(x,y){
     tempSelectedNum = num;
 }
 //移动棋子动画
-function movePiece(num1,num2){
+function movePiece(num1,num2,pathStore){
     board.isMoving = true;
     let currentPosition = board.num2Position(num1);//当前坐标
     let endPostion = board.num2Position(num2);     //终点坐标
-    let piecePath = board.data.BFS(num1,num2);    //路径 
+    let piecePath = pathStore;    //路径 
     board.data.addPiece(num1);
     let pieceKeyPath = [];
     let temp;
@@ -197,7 +209,7 @@ function render(){
 }
 //动画
 function animate(){
-    if (board.isMoving) animateTag = requestAnimationFrame(animate);
+    if (board.isMoving) render();
     else cancelAnimationFrame(animateTag);
     render();
 }
