@@ -7,13 +7,7 @@ var nextBalls = new GRID.NextBalls();
 let tempSelectedNum = -1;
 let animateTag;
 let score=0;
-var scoreFrame = document.getElementById("ScoreFrame");
-scoreFrame.textContent = score;
-//禁用触摸滑动，针对微信
-document.body.addEventListener("touchmove",(e) => {
-    e.preventDefault();
-})
-
+var scoreFrame = document.getElementById("Score");
 init(); //初始化
 animate();//动画
 listener(); //监听
@@ -29,11 +23,36 @@ function init(){
 }
 
 function listener(){
+    //点击事件监控
     renderer.domElement.addEventListener("click",(e) => {
         let x = e.x - parseInt(renderer.domElement.getBoundingClientRect().left,10);
         let y = e.y - parseInt(renderer.domElement.getBoundingClientRect().top,10);
         action(x,y);
     });
+    //禁用触摸滑动，针对微信
+    document.body.addEventListener("touchmove",(e) => {
+        e.preventDefault();
+    })
+    //改变窗口监控
+    window.addEventListener("resize",() => {
+        setTimeout(() => {
+            renderer.setSize(GameContainer.clientWidth,GameContainer.clientHeight);
+            renderer2.setSize(nextBallsFrame.clientWidth,nextBallsFrame.clientHeight);
+            render();
+        },500);
+    })
+    //重置监控
+    document.getElementById("reset").addEventListener("click",reset);
+}
+
+function reset(){
+    board = new GRID.Board(9);
+    board.setColor("#E26A6A","#F1C40F","#C0392D","#8E44AD","#2ECC71","#D35400","#2980D9");
+    board.randomColor(5);
+    board.addPiece(5);
+    board.randomColor(3);
+    score=0;
+    render();
 }
 
 //点击事件触发-逻辑
@@ -48,8 +67,9 @@ function action(x,y){
                 }
             }//初始化
             board.piece[num].selectSwitch();
-            console.log(`piece[${num}] is selected`)
-        }else console.log(`piece[${num}] was selected`);
+            // console.log(`piece[${num}] is selected`)
+        }
+        // else console.log(`piece[${num}] was selected`);
     }else if (typeof board.piece[tempSelectedNum] === "object") { //之前选择的棋盘有棋子么
         let pathStore = board.data.BFS(tempSelectedNum,num);
         let arrive = true;
@@ -65,18 +85,16 @@ function action(x,y){
                         for(i=0;i<board.randomPosStore.length;i++){
                             Eliminate(board.randomPosStore[i]);
                         }
-                        scoreFrame.textContent = score;
                         board.randomColor(3);
                         nextBalls.colorStore = board.tempColor;
                         animate();
                     }else{
                         animate();
-                        scoreFrame.textContent = score;
                     }
                     clearInterval(moveT);
                 }
             },100);
-            console.log(`square[${num}] is empty`);
+            // console.log(`square[${num}] is empty`);
         }
     }
     tempSelectedNum = num;
@@ -156,9 +174,7 @@ function Eliminate(num){
         for (let i=0;i<EliminateArray.length;i++){
             board.deletePiece(EliminateArray[i]);
         }
-        console.log(EliminateArray.length);
         score+=10+(EliminateArray.length-5)*(EliminateArray.length-5)*2;
-        console.log(score);
         return true;
     }else{
         return false;
@@ -206,6 +222,7 @@ var concat = (function(){
 function render(){
     renderer.render(board);
     renderer2.render(nextBalls);
+    scoreFrame.textContent = score;
 }
 //动画
 function animate(){

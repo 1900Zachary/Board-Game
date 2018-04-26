@@ -16,8 +16,8 @@
             this.height = height;
             this.domElement.width = width*this.ratio;
             this.domElement.height = height*this.ratio;
-            this.domElement.style.width = width + "px";
-            this.domElement.style.height = height + "px";
+            this.domElement.style.width = `${width}px`;
+            this.domElement.style.height = `${height}px`;
             this.context.scale(this.ratio,this.ratio);
         }
 
@@ -43,7 +43,7 @@
         setSize(w,h){
             this.width = w;
             this.height = h;
-            this.radius = h/3;
+            this.radius = w/16;
         }
 
         setContext(context){
@@ -138,7 +138,7 @@
         }
 
         deletePiece(num){
-            this.piece[num] = undefined;
+            Reflect.deleteProperty(this.piece,[num]);
             this.data.deletePiece(num);
         }
 
@@ -243,12 +243,6 @@
             }
             if (i == this.squareSum) isEmpty = false;
             return isEmpty;
-        }
-
-        Arrive(squareNum1,squareNum2){
-            let temp = this.BFS(squareNum1,squareNum2);
-            if (temp.length === 0) return false;
-            else return true;
         }
 
         randomNum(){

@@ -27,6 +27,7 @@ body {
     background-color: #666;
     flex-grow:3;
     flex-basis: 0;
+    display: flex;
 }
 #IconsFrame {
     background-color: #999;
@@ -64,4 +65,12 @@ body {
     display: block;
     width: 100%;
     padding-bottom:100%;
+}
+
+#Score{
+    font-size: 7rem; 
+    color:white;
+    margin:auto 10%;
+    width: 80%;
+    text-align: right;
 }
